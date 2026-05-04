@@ -4,7 +4,8 @@ from app.config import settings
 from app.database import create_db_and_tables
 from app.routers.todos import router as todos_router
 
-app = FastAPI(title="ToDo API", version="1.0.0", description="A simple ToDo API built with FastAPI")
+app = FastAPI(title=settings.APP_NAME, version=settings.APP_VERSION)
+
 
 @app.on_event("startup")
 def on_startup():
@@ -19,5 +20,6 @@ def root():
 @app.get("/health", tags=["health"])
 def health():
     return {"status": "ok"}
+
 
 app.include_router(todos_router)

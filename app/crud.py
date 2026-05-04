@@ -1,10 +1,11 @@
 from datetime import datetime
 from typing import Optional, Literal
+
 from sqlalchemy import asc, desc
-from sqlmodel import select
+from sqlmodel import Session, select
+
 from app.models import Todo
 from app.schemas import TodoCreate, TodoUpdate
-from sqlmodel import Session
 
 
 def create_todo(session: Session, todo_in: TodoCreate) -> Todo:
@@ -37,7 +38,9 @@ def list_todos(
         statement = statement.where(Todo.priority == priority)
 
     sort_column = getattr(Todo, sort_by)
-    statement = statement.order_by(desc(sort_column) if order == "desc" else asc(sort_column))
+    statement = statement.order_by(
+        desc(sort_column) if order == "desc" else asc(sort_column)
+    )
     statement = statement.offset(offset).limit(limit)
 
     return list(session.exec(statement).all())
@@ -59,6 +62,7 @@ def update_todo(session: Session, todo_id: int, todo_in: TodoCreate) -> Optional
     session.refresh(db_todo)
     return db_todo
 
+
 def patch_todo(session: Session, todo_id: int, todo_in: TodoUpdate) -> Optional[Todo]:
     db_todo = session.get(Todo, todo_id)
     if not db_todo:
@@ -69,10 +73,12 @@ def patch_todo(session: Session, todo_id: int, todo_in: TodoUpdate) -> Optional[
         setattr(db_todo, key, value)
 
     db_todo.updated_at = datetime.utcnow()
+
     session.add(db_todo)
     session.commit()
     session.refresh(db_todo)
     return db_todo
+
 
 def delete_todo(session: Session, todo_id: int) -> bool:
     db_todo = session.get(Todo, todo_id)

@@ -1,4 +1,5 @@
-from typing import Optional, Literal 
+from typing import Optional, Literal
+
 from fastapi import APIRouter, HTTPException, Query
 
 from app.crud import (
@@ -13,6 +14,7 @@ from app.database import SessionDep
 from app.schemas import TodoCreate, TodoRead, TodoUpdate
 
 router = APIRouter(prefix="/todos", tags=["todos"])
+
 
 @router.post("", response_model=TodoRead, status_code=201)
 def create_todo_route(todo: TodoCreate, session: SessionDep):
@@ -52,8 +54,9 @@ def get_todo_route(todo_id: int, session: SessionDep):
 def update_todo_route(todo_id: int, todo: TodoCreate, session: SessionDep):
     updated = update_todo(session, todo_id, todo)
     if not updated:
-        raise HTTPException(status_code=404, detail="Todo not found")   
+        raise HTTPException(status_code=404, detail="Todo not found")
     return updated
+
 
 @router.patch("/{todo_id}", response_model=TodoRead)
 def patch_todo_route(todo_id: int, todo: TodoUpdate, session: SessionDep):
